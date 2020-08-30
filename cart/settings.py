@@ -15,15 +15,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-SEND_GRID_API_KEY = ''
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = ''
-ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# SEND_GRID_API_KEY = ''
+# EMAIL_HOST = 'smtp.sendgrid.net'
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = ''
+# ACCOUNT_EMAIL_SUBJECT_PREFIX = ''
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Application definition
 
