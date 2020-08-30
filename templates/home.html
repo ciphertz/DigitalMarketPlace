@@ -1,0 +1,40 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class='row'>
+{% for product in featured_products %}
+<div class = "col-sm-4">
+  <div class = "thumbnail">
+
+{% if product.get_featured_image %}
+<img src="{{ MEDIA_URL }}media/{{ product.get_featured_image }}" style='max-height:200px;'><br/>
+{% else %}
+<img src="{{ MEDIA_URL }}media/products/image/3.jpg" style='max-height:200px;'>
+{% endif %}
+<div class = "caption">
+<h3>{{ product }}</h3>
+<p>{{ product.description }}</p>
+<p>{{ product.get_price }}</p>
+<p>
+   <a href ="{% url 'products:single_product' product.slug %}" class = "btn btn-primary" role = "button">
+      View Product
+   </a>
+   {% if product in user.profile.ebooks.all %}
+    <!-- add a button here to see the product -->
+    You own this
+    {% elif product in current_order_products %}
+    <a href="{% url 'shopping_cart:order_summary' %}" class="btn btn-warning">Go to Cart</a>
+    {% else %}
+    <a href="{% url 'shopping_cart:add_to_cart' product.id %}" class="btn btn-warning">Add to Cart</a>
+</p>
+{% endif %}
+</div>
+</div>
+</div>
+{% endfor %}
+
+  </div>
+
+
+{% endblock %}

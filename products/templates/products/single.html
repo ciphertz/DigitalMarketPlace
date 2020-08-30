@@ -1,0 +1,183 @@
+
+{% extends "base.html" %}
+{% block style %}
+<style>
+
+.rating {
+    float:left;
+     width: 200px;
+}
+/* :not(:checked) is a filter, so that browsers that don’t support :checked don’t
+   follow these rules. Every browser that supports :checked also supports :not(), so
+   it doesn’t make the test unnecessarily selective */
+.rating:not(:checked) > input {
+    position:absolute;
+    top:-9999px;
+    clip:rect(0,0,0,0);
+}
+.rating:not(:checked) > label {
+    float:right;
+    width:1em;
+    padding:0 .1em;
+    overflow:hidden;
+    white-space:nowrap;
+    cursor:pointer;
+    font-size:200%;
+    line-height:1.2;
+    color:#ddd;
+    text-shadow:1px 1px #bbb, 2px 2px #666, .1em .1em .2em rgba(0,0,0,.5);
+}
+.rating:not(:checked) > label:before {
+    content: '★ ';
+}
+.rating > input:checked ~ label {
+    color: #f70;
+    text-shadow:1px 1px #c60, 2px 2px #940, .1em .1em .2em rgba(0,0,0,.5);
+}
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label {
+    color: gold;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
+}
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label {
+    color: #ea0;
+    text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);
+}
+.rating > label:active {
+    position:relative;
+    top:2px;
+    left:2px;
+}
+
+</style>
+{% endblock style %}
+
+<script>
+$(document).ready(function(){
+{% block jquery %}
+$(".rating input[value='{{ my_rating }}']").attr("checked", "checked");
+$(".rating input[type='radio']").click(function(event){
+	// event.preventDefault()
+	var inputValue = $(this).val()
+	console.log(inputValue)
+	var request = $.ajax({
+		method: "POST",
+		url: "{% url 'products:ajax_rating' %}",
+		data: {
+			product_id: "{{ product.id }}",
+			rating_value: inputValue,
+
+		}
+	})
+	request.done(function(data){
+	})
+	request.fail(function(jqXHR, textStatus){
+		if (jqXHR.status == 404) {
+			alert("Page not found!")
+		} else if (jqXHR.status == 401) {
+			alert("You must be logged in to do this.")
+		} else {
+			alert("There was an error with your request. Please try again.")
+		}
+	})
+})
+
+{% endblock jquery %}
+})
+</script>
+
+{% block content %}
+
+<div class="row">
+<div class="col-sm-8 pull-left">
+<h1>{{ product }}</h1>
+{% for img in images %}
+<img src="{{ MEDIA_URL }}{{ img.image.url }}" width="500"/>
+{% endfor %}
+{% if related %}
+<h1>Related Product{% if related|length > 1%}s{% endif %}</h1>
+<ul>
+  {% for item in related %}
+  <li>
+    <a href="{{ item.get_absolute_url }}">{{ item }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+</div>
+
+<!---starts right panel----->
+
+<div class='col-sm-4 pull-right'>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Product:{{ product }}</h3>
+
+    </div>
+    <div class="panel-body">
+      {{ product.description }}<br/>
+      ${{ product.get_price }}
+      <p>Purchases: {{ product.transaction_set.count }}</p>
+      <p>
+        			<strong>Ratings</strong>
+
+        		<div class="rating">
+        	    <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="super cool">5 stars</label>
+        	    <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="Pretty good">4 stars</label>
+        	    <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="normal">3 stars</label>
+        	    <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="Kinda bad">2 stars</label>
+        	    <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="Sucks">1 star</label>
+        		</div>
+              <br/>
+              <br/>
+              <p>
+        			{{ rating_avg.rating__avg }} Average <br/>
+              Rating by {{ rating_avg.rating__count }} Users.
+              </p>
+      <br/>
+      {% if object in current_order_products %}
+        In Cart <a class='btn btn-success' href='{% url "shopping_cart:order_summary" %}'>View Cart</a>
+      {% endif %}
+  </div>
+</div>
+
+{% if categories %}
+<div class="panel panel-default">
+<div class="panel-heading">
+<h1 class="panel-title">Categor{% if categories|length == 1 %}y{% else %}ies{% endif %}</h1>
+  </div>
+<div class="panel-body">
+<ul>
+
+{% for item in categories %}
+<li>
+  <a href="{{ item.get_absolute_url }}">{{ item }}</a>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">My actions</h3>
+  </div>
+  <div class="panel-body">
+    <div class="btn-group-vertical">
+    {% if edit %}
+     <a class='btn btn-default' href=''>Edit {{ product }}</a>
+     <a class='btn btn-default' href=''>manage Images</a>
+
+</div>
+</div>
+</div>
+
+
+{% endif %}
+
+</div>
+</div>
+{% endblock content %}
